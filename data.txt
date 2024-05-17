@@ -1,0 +1,16 @@
+POST /auth/vi HTTP/2
+Host: app.luzmo.com
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: https://app.luzmo.com/
+Content-Type: application/json
+Content-Length: 72
+Origin: https://app.luzmo.com
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Priority: u=1
+Te: trailers
+
+{"email":"sohepo1788@godsigma.com","password":"FUZZ"}
