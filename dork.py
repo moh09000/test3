@@ -6,31 +6,66 @@ import time
 import random
 
 # Path to your file containing URLs
-url_file = '/mnt/data/links.txt'
+url_file = '/sec/root/test3/links.txt'
 
 # Setup Chrome options for Selenium (headless mode to avoid opening the browser window)
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run in headless mode to avoid opening the browser
 
 # Path to the ChromeDriver (replace with your path if needed)
-service = Service('/path/to/chromedriver')  # Ensure ChromeDriver is in your PATH or provide the full path
+service = Service('/usr/bin/chromedriver')  # Ensure ChromeDriver is in your PATH or provide the full path
 
 # Initialize the WebDriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# Function to process a single URL using Selenium
+# Function to process and extract search results from a Google search URL
 def process_url(url):
     try:
         # Open the URL in the browser
         driver.get(url)
 
-        # Extract the page title (modify this based on what you want to scrape)
-        page_title = driver.title
-        print(f"Processed URL: {url}, Title: {page_title}")
+        # Wait for the page to load completely (you can adjust the time if needed)
+        time.sleep(3)
+
+        # Extract search results: titles, URLs, and descriptions
+        search_results = driver.find_elements(By.CSS_SELECTOR, 'div.g')
+
+        # Prepare a list to store the results
+        results = []
+
+        for result in search_results:
+            try:
+                # Extract the title
+                title_element = result.find_element(By.CSS_SELECTOR, 'h3')
+                title = title_element.text
+
+                # Extract the URL
+                url_element = result.find_element(By.CSS_SELECTOR, 'a')
+                link = url_element.get_attribute('href')
+
+                # Extract the description (snippet)
+                snippet_element = result.find_element(By.CSS_SELECTOR, 'span.st')
+                snippet = snippet_element.text
+
+                # Save the result in a dictionary
+                results.append({
+                    'title': title,
+                    'url': link,
+                    'snippet': snippet
+                })
+
+            except Exception as e:
+                print(f"Failed to extract a result: {e}")
+                continue
         
-        # Save the result
-        with open('results.txt', 'a') as f:
-            f.write(f"URL: {url}\nTitle: {page_title}\n\n")
+        # Save the extracted results to a file
+        with open('search_results.txt', 'a') as f:
+            f.write(f"Results for URL: {url}\n")
+            for res in results:
+                f.write(f"Title: {res['title']}\nURL: {res['url']}\nSnippet: {res['snippet']}\n\n")
+            f.write("="*40 + "\n\n")
+
+        print(f"Processed URL: {url}, Results saved.")
 
     except Exception as e:
         print(f"Failed to process {url}: {e}")
